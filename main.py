@@ -165,6 +165,6 @@ if __name__ == "__main__":
         clear_directory("temp")
         download_soundcloud_thumbnails(profile_url)
     clear_directory("output")
-    add_text_to_images(top=True)
+    add_text_to_images(top=False)
     
     open_directory("output")
