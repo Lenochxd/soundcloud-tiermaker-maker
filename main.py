@@ -53,13 +53,12 @@ def download_soundcloud_thumbnails(profile_url):
     subprocess.run(cmd, check=True)
     print(f"Thumbnails downloaded to temporary directory: {temp_dir}")
 
-def add_text_to_images(top=False):
+def add_text_to_images(top=False, font_size=36):
     temp_dir = "temp"
     output_dir = "output"
     os.makedirs(output_dir, exist_ok=True)
 
     max_width = 240  # pixels, for text area
-    font_size = 36
 
     for filename in os.listdir(temp_dir):
         printd('---')
@@ -154,17 +153,26 @@ def add_text_to_images(top=False):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python main.py <soundcloud_profile_url> [--use-temp] [--top] [--debug]")
+        print("Usage: python main.py <soundcloud_profile_url> [--top] [--font-size <size>] [--use-temp] [--debug]")
         sys.exit(1)
     profile_url = sys.argv[1]
     if not profile_url.startswith("https://soundcloud.com/"):
         print("Please provide a valid SoundCloud profile URL.")
         sys.exit(1)
     
+    # Allow font size to be set via command line argument: --font-size <size>
+    font_size = 36  # Default font size
+    for i, arg in enumerate(sys.argv):
+        if arg == "--font-size" and i + 1 < len(sys.argv):
+            try:
+                font_size = int(sys.argv[i + 1])
+            except ValueError:
+                print("Invalid font size specified. Using default.")
+    
     if not "--use-temp" in sys.argv:
         clear_directory("temp")
         download_soundcloud_thumbnails(profile_url)
     clear_directory("output")
-    add_text_to_images(top="--top" in sys.argv)
-    
+    add_text_to_images(top="--top" in sys.argv, font_size=font_size)
+
     open_directory("output")
