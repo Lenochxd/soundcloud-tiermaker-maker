@@ -59,7 +59,7 @@ def add_text_to_images(top=False):
     os.makedirs(output_dir, exist_ok=True)
 
     max_width = 240  # pixels, for text area
-    font_size = 24
+    font_size = 36
 
     for filename in os.listdir(temp_dir):
         printd('---')
