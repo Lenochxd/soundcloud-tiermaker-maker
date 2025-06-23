@@ -154,7 +154,7 @@ def add_text_to_images(top=False):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python main.py <soundcloud_profile_url> [--use-temp] [--debug]")
+        print("Usage: python main.py <soundcloud_profile_url> [--use-temp] [--top] [--debug]")
         sys.exit(1)
     profile_url = sys.argv[1]
     if not profile_url.startswith("https://soundcloud.com/"):
@@ -165,6 +165,6 @@ if __name__ == "__main__":
         clear_directory("temp")
         download_soundcloud_thumbnails(profile_url)
     clear_directory("output")
-    add_text_to_images(top=False)
+    add_text_to_images(top="--top" in sys.argv)
     
     open_directory("output")
