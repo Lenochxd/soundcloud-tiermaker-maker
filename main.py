@@ -149,7 +149,8 @@ def add_text_to_images(top=False, font="arial.ttf", font_size=36):
                         font=font,
                         fill="black"
                     )
-
+            # Sanitize filename again for saving output
+            safe_filename = "".join(c if c.isalnum() or c in " ._-" else "_" for c in filename)
             out_path = os.path.join(output_dir, safe_filename)
             new_img.save(out_path)
             print(f"Added text to image: {out_path}")
