@@ -65,6 +65,9 @@ def add_text_to_images(top=False, font="arial.ttf", font_size=36):
         if filename.lower().endswith((".jpg", ".jpeg", ".png")):
             image_path = os.path.join(temp_dir, filename)
             name, _ = os.path.splitext(filename)
+            # Sanitize filename to avoid UnicodeEncodeError
+            safe_filename = "".join(c if c.isalnum() or c in " ._-" else "_" for c in filename)
+            safe_filename = safe_filename.encode("ascii", "replace").decode("ascii")
             img = Image.open(image_path).convert("RGB")
             img = img.resize((256, 256), Image.LANCZOS)
 
@@ -147,7 +150,7 @@ def add_text_to_images(top=False, font="arial.ttf", font_size=36):
                         fill="black"
                     )
 
-            out_path = os.path.join(output_dir, filename)
+            out_path = os.path.join(output_dir, safe_filename)
             new_img.save(out_path)
             print(f"Added text to image: {out_path}")
 
