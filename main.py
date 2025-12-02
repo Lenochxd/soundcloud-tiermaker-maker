@@ -81,7 +81,7 @@ def add_text_to_images(top=False, font="arial.ttf", font_size=36):
 
             # Wrap text to fit width
             lines = []
-            words = sanitize(name).split()
+            words = name.split()
             line = ""
             for word in words:
                 test_line = line + (" " if line else "") + word
