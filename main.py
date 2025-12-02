@@ -9,6 +9,9 @@ def printd(*args, **kwargs):
     if "--debug" in sys.argv:
         print(*args, **kwargs)
 
+def sanitize(name):
+    return "".join(c if c.isalnum() or c in " ._-" else "_" for c in name).encode("utf-8", "replace").decode("utf-8")
+
 def clear_directory(dir_name="temp"):
     if os.path.exists(dir_name):
         for filename in os.listdir(dir_name):
@@ -66,8 +69,7 @@ def add_text_to_images(top=False, font="arial.ttf", font_size=36):
             image_path = os.path.join(temp_dir, filename)
             name, _ = os.path.splitext(filename)
             # Sanitize filename to avoid UnicodeEncodeError
-            safe_filename = "".join(c if c.isalnum() or c in " ._-" else "_" for c in filename)
-            safe_filename = safe_filename.encode("ascii", "replace").decode("ascii")
+            safe_filename = sanitize(filename)
             img = Image.open(image_path).convert("RGB")
             img = img.resize((256, 256), Image.LANCZOS)
 
@@ -79,7 +81,7 @@ def add_text_to_images(top=False, font="arial.ttf", font_size=36):
 
             # Wrap text to fit width
             lines = []
-            words = name.split()
+            words = sanitize(name).split()
             line = ""
             for word in words:
                 test_line = line + (" " if line else "") + word
@@ -150,7 +152,7 @@ def add_text_to_images(top=False, font="arial.ttf", font_size=36):
                         fill="black"
                     )
             # Sanitize filename again for saving output
-            safe_filename = "".join(c if c.isalnum() or c in " ._-" else "_" for c in filename)
+            safe_filename = sanitize(filename)
             out_path = os.path.join(output_dir, safe_filename)
             new_img.save(out_path)
             print(f"Added text to image: {out_path}")
