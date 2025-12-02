@@ -75,9 +75,9 @@ def add_text_to_images(top=False, font="arial.ttf", font_size=36):
 
             # Prepare font
             try:
-                font = ImageFont.truetype(font, font_size)
+                text_font = ImageFont.truetype(font, font_size)
             except:
-                font = ImageFont.load_default()
+                text_font = ImageFont.load_default()
 
             # Wrap text to fit width
             lines = []
@@ -87,7 +87,7 @@ def add_text_to_images(top=False, font="arial.ttf", font_size=36):
                 test_line = line + (" " if line else "") + word
                 dummy_img = Image.new("RGB", (256, 10))
                 draw = ImageDraw.Draw(dummy_img)
-                text_width = draw.textlength(test_line, font=font)
+                text_width = draw.textlength(test_line, font=text_font)
                 if text_width <= max_width:
                     line = test_line
                 else:
@@ -102,12 +102,12 @@ def add_text_to_images(top=False, font="arial.ttf", font_size=36):
             draw = ImageDraw.Draw(dummy_img)
             
             # Use getbbox or getsize_multiline instead of deprecated getsize
-            if hasattr(font, "getbbox"):
+            if hasattr(text_font, "getbbox"):
                 # For newer Pillow versions
-                text_height = font.getbbox("A")[3] - font.getbbox("A")[1]
+                text_height = text_font.getbbox("A")[3] - text_font.getbbox("A")[1]
             else:
                 # Fallback for older versions
-                text_height = font.getsize("A")[1]
+                text_height = text_font.getsize("A")[1]
                 
             total_text_height = text_height * len(lines)
             line_spacing = int(text_height * 0.2)  # Add some spacing between lines
@@ -128,11 +128,11 @@ def add_text_to_images(top=False, font="arial.ttf", font_size=36):
                 # Center text block vertically in the white box
                 y_start = (box_height - (total_text_height_with_spacing + 11)) // 2
                 for i, line in enumerate(lines):
-                    text_width = draw.textlength(line, font=font)
+                    text_width = draw.textlength(line, font=text_font)
                     draw.text(
                         ((256 - text_width) // 2, y_start + i * (text_height + line_spacing)),
                         line,
-                        font=font,
+                        font=text_font,
                         fill="black"
                     )
                 new_img.paste(img, (0, box_height))
@@ -144,11 +144,11 @@ def add_text_to_images(top=False, font="arial.ttf", font_size=36):
                 print(f"{total_text_height_with_spacing = }")
                 
                 for i, line in enumerate(lines):
-                    text_width = draw.textlength(line, font=font)
+                    text_width = draw.textlength(line, font=text_font)
                     draw.text(
                         ((256 - text_width) // 2, y_start + i * (text_height + line_spacing)),
                         line,
-                        font=font,
+                        font=text_font,
                         fill="black"
                     )
             # Sanitize filename again for saving output
