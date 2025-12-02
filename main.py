@@ -53,7 +53,7 @@ def download_soundcloud_thumbnails(profile_url):
     subprocess.run(cmd, check=True)
     print(f"Thumbnails downloaded to temporary directory: {temp_dir}")
 
-def add_text_to_images(top=False, font_size=36):
+def add_text_to_images(top=False, font="arial.ttf", font_size=36):
     temp_dir = "temp"
     output_dir = "output"
     os.makedirs(output_dir, exist_ok=True)
@@ -70,7 +70,7 @@ def add_text_to_images(top=False, font_size=36):
 
             # Prepare font
             try:
-                font = ImageFont.truetype("arial.ttf", font_size)
+                font = ImageFont.truetype(font, font_size)
             except:
                 font = ImageFont.load_default()
 
