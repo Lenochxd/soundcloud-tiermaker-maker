@@ -1,8 +1,14 @@
 import subprocess
 import sys
 import os
+import shutil
 from PIL import Image, ImageDraw, ImageFont
 
+temp_dir = "temp"
+output_dir = "output"
+
+os.makedirs(temp_dir, exist_ok=True)
+os.makedirs(output_dir, exist_ok=True)
 
 def printd(*args, **kwargs):
     """Debug print function that can be easily disabled."""
@@ -44,8 +50,6 @@ def download_soundcloud_thumbnails(profile_url):
     # --skip-download: don't download audio/video
     # --write-thumbnail: download thumbnail image
     # --output: set output filename template
-    temp_dir = "temp"
-    os.makedirs(temp_dir, exist_ok=True)
     cmd = [
         "yt-dlp",
         "--skip-download",
@@ -56,11 +60,21 @@ def download_soundcloud_thumbnails(profile_url):
     subprocess.run(cmd, check=True)
     print(f"Thumbnails downloaded to temporary directory: {temp_dir}")
 
-def add_text_to_images(top=False, font="arial.ttf", font_size=36):
-    temp_dir = "temp"
-    output_dir = "output"
-    os.makedirs(output_dir, exist_ok=True)
+def copy_custom_images(image_paths):
+    """Copy custom images from provided filepaths to temp directory."""
+    for image_path in image_paths:
+        if os.path.isfile(image_path):
+            try:
+                filename = os.path.basename(image_path)
+                dest_path = os.path.join(temp_dir, filename)
+                shutil.copy2(image_path, dest_path)
+                printd(f"Copied custom image: {dest_path}")
+            except Exception as e:
+                print(f"Failed to copy {image_path}. Reason: {e}")
+        else:
+            print(f"Image file not found: {image_path}")
 
+def add_text_to_images(top=False, font="arial.ttf", font_size=36):
     max_width = 240  # pixels, for text area
 
     for filename in os.listdir(temp_dir):
@@ -159,7 +173,7 @@ def add_text_to_images(top=False, font="arial.ttf", font_size=36):
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        print("Usage: python main.py <soundcloud_profile_url> [--top] [--font-size <size>] [--use-temp] [--debug]")
+        print("Usage: python main.py <soundcloud_profile_url> [--top] [--font-size <size>] [--custom-images <path1> <path2> ...] [--use-temp] [--debug]")
         sys.exit(1)
     profile_url = sys.argv[1]
     if not profile_url.startswith("https://soundcloud.com/"):
@@ -168,16 +182,28 @@ if __name__ == "__main__":
     
     # Allow font size to be set via command line argument: --font-size <size>
     font_size = 36  # Default font size
+    custom_images = []
+    
     for i, arg in enumerate(sys.argv):
         if arg == "--font-size" and i + 1 < len(sys.argv):
             try:
                 font_size = int(sys.argv[i + 1])
             except ValueError:
                 print("Invalid font size specified. Using default.")
+        elif arg == "--custom-images":
+            # Collect all following arguments until next flag
+            j = i + 1
+            while j < len(sys.argv) and not sys.argv[j].startswith("--"):
+                custom_images.append(sys.argv[j])
+                j += 1
     
     if not "--use-temp" in sys.argv:
         clear_directory("temp")
         download_soundcloud_thumbnails(profile_url)
+    
+    if custom_images:
+        copy_custom_images(custom_images)
+    
     clear_directory("output")
     add_text_to_images(top="--top" in sys.argv, font_size=font_size)
 
