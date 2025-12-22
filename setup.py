@@ -12,7 +12,9 @@ ENTRYPOINT = "gui.py"
 build_exe_options = {
     "packages": [],
     "excludes": [],
-    "include_files": [],
+    "include_files": [
+        "README.md"
+    ],
 }
 
 # ---- Executable target ----
